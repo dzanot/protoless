@@ -31,6 +31,7 @@ trait Encoder[A] extends Serializable { self =>
     val out = new ByteArrayOutputStream()
     val cos = CodedOutputStream.newInstance(out)
     encode(a, cos)
+    cos.flush
     out
   }
 
