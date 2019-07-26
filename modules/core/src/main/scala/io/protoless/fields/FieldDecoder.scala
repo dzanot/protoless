@@ -22,7 +22,6 @@ import io.protoless.tag._
   */
 @implicitNotFound("No FieldDecoder found for type ${A}.")
 trait FieldDecoder[A] extends Serializable { self =>
-
   /**
     * Read value located at index `index` as an object of type `A` from the CodedInputStream `input`.
     */
