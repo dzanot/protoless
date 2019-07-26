@@ -29,19 +29,19 @@ trait CustomMappingDecoderInstances extends IncrementalDecoderInstances {
     }
   }
 
-  // Decode mapping specified with Literal types (-Yliteral-types) (1 :: 3 :: HNil)
-  implicit def decodeCustomMappingHListLiteral[H, T <: HList, L <: Int, TN <: HList](implicit
-    hDecoder: FieldDecoder[H],
-    index: ValueOf[L],
-    tDecoder: CustomMappingDecoder[T, TN]
-  ): CustomMappingDecoder[H :: T, L :: TN] = new CustomMappingDecoder[H :: T, L :: TN] {
-    override def decode(input: CodedInputStream): Result[H :: T] = {
-      for {
-        h <- hDecoder.read(input, valueOf[L]).right
-        t <- tDecoder.decode(input).right
-      } yield h :: t
-    }
-  }
+//  // Decode mapping specified with Literal types (-Yliteral-types) (1 :: 3 :: HNil)
+//  implicit def decodeCustomMappingHListLiteral[H, T <: HList, L <: Int, TN <: HList](implicit
+//    hDecoder: FieldDecoder[H],
+//    index: ValueOf[L],
+//    tDecoder: CustomMappingDecoder[T, TN]
+//  ): CustomMappingDecoder[H :: T, L :: TN] = new CustomMappingDecoder[H :: T, L :: TN] {
+//    override def decode(input: CodedInputStream): Result[H :: T] = {
+//      for {
+//        h <- hDecoder.read(input, valueOf[L]).right
+//        t <- tDecoder.decode(input).right
+//      } yield h :: t
+//    }
+//  }
 
   implicit def decodeCustomMapping[A, L <: HList, R <: HList](implicit
     gen: Generic.Aux[A, R],

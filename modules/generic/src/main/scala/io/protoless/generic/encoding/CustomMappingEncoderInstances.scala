@@ -27,18 +27,18 @@ trait CustomMappingEncoderInstances extends IncrementalEncoderInstances {
     }
   }
 
-  // Encode mapping specified with Literal (1 :: 3 :: HNil)
-  implicit def encodeCustomMappingHListLiteral[H, T <: HList, L <: Int, TN <: HList](implicit
-    hEncoder: FieldEncoder[H],
-    index: ValueOf[L],
-    tEncoder: CustomMappingEncoder[T, TN]
-  ): CustomMappingEncoder[H :: T, L :: TN] = new CustomMappingEncoder[H :: T, L :: TN] {
-    override def encode(a: H :: T, output: CodedOutputStream): Unit = {
-      val (h :: t) = a
-      hEncoder.write(valueOf[L], h, output)
-      tEncoder.encode(t, output)
-    }
-  }
+//  // Encode mapping specified with Literal (1 :: 3 :: HNil)
+//  implicit def encodeCustomMappingHListLiteral[H, T <: HList, L <: Int, TN <: HList](implicit
+//    hEncoder: FieldEncoder[H],
+//    index: ValueOf[L],
+//    tEncoder: CustomMappingEncoder[T, TN]
+//  ): CustomMappingEncoder[H :: T, L :: TN] = new CustomMappingEncoder[H :: T, L :: TN] {
+//    override def encode(a: H :: T, output: CodedOutputStream): Unit = {
+//      val (h :: t) = a
+//      hEncoder.write(valueOf[L], h, output)
+//      tEncoder.encode(t, output)
+//    }
+//  }
 
   implicit def encodeCustomMapping[A, L <: HList, R <: HList](implicit
     gen: Generic.Aux[A, R],
