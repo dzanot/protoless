@@ -120,7 +120,7 @@ class FieldEncodingCheck extends ProtolessSuite with GeneratorDrivenPropertyChec
 
   val indexGenerator: Gen[Int] = Gen.choose(1, 1000)
 
-  private def check[T](implicit enc: FieldEncoder[T], dec: FieldDecoder[T], arbitrary: Arbitrary[T]) = {
+  private def check[T](implicit default: FieldDefault[T], enc: FieldEncoder[T], dec: FieldDecoder[T], arbitrary: Arbitrary[T]) = {
     forAll(indexGenerator) { index =>
       forAll((t: T) =>
         encodeDecodeField(t, index)
@@ -128,7 +128,7 @@ class FieldEncodingCheck extends ProtolessSuite with GeneratorDrivenPropertyChec
     }
   }
 
-  private def encodeDecodeField[T](t: T, index: Int)(implicit enc: FieldEncoder[T], dec: FieldDecoder[T]) = {
+  private def encodeDecodeField[T](t: T, index: Int)(implicit default: FieldDefault[T], enc: FieldEncoder[T], dec: FieldDecoder[T]) = {
     val bytesEncoded = enc.encodeAsBytes(index, t)
     val entityDecoded = dec.decode(bytesEncoded, index).right.get
     val entityReEncoded = enc.encodeAsBytes(index, entityDecoded)
