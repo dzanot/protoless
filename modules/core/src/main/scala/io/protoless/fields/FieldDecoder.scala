@@ -31,9 +31,10 @@ trait FieldDecoder[A] extends Serializable { self =>
     * Read value located at index `index` as an object of type `A` from an Array[Byte].
     */
   final def decode(input: Array[Byte], index: Int)(implicit default: FieldDefault[A]): Result[A] = {
-    read(CIS.newInstance(input), index) match {
-      case Left(MissingField(_,_,_,_)) => Right(FieldDefault[A].default)
-      case x => x
+    if(input.isEmpty) {
+      Right(FieldDefault[A].default)
+    } else {
+      read(CIS.newInstance(input), index)
     }
   }
 
@@ -444,7 +445,6 @@ trait LowPriorityFieldDecoder {
     }
 
     override def read(input: CIS, index: Int): Result[C[A]] = {
-
       val tag = readTag(input, index)
 
       if (tag.fieldNumber > index) Right(cbf.apply().result())
