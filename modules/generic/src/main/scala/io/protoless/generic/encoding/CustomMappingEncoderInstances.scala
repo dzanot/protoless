@@ -5,7 +5,6 @@ import com.google.protobuf.CodedOutputStream
 import shapeless.{::, Generic, HList, HNil, Nat}
 import shapeless.ops.nat.ToInt
 
-import io.protoless.messages.encoders.CustomMappingEncoder
 import io.protoless.fields.FieldEncoder
 
 trait CustomMappingEncoderInstances extends IncrementalEncoderInstances {
@@ -18,7 +17,7 @@ trait CustomMappingEncoderInstances extends IncrementalEncoderInstances {
   implicit def encodeCustomMappingHList[H, T <: HList, L <: Nat, TN <: HList](implicit
     hEncoder: FieldEncoder[H],
     index: ToInt[L],
-    tEncoder: CustomMappingEncoder[T, TN]
+    tEncoder: DerivedCustomMappingEncoder[T, TN]
   ): DerivedCustomMappingEncoder[H :: T, L :: TN] = new DerivedCustomMappingEncoder[H :: T, L :: TN] {
     override def encode(a: H :: T, output: CodedOutputStream): Unit = {
       val (h :: t) = a
@@ -42,7 +41,7 @@ trait CustomMappingEncoderInstances extends IncrementalEncoderInstances {
 
   implicit def encodeCustomMapping[A, L <: HList, R <: HList](implicit
     gen: Generic.Aux[A, R],
-    encoder: CustomMappingEncoder[R, L]
+    encoder: DerivedCustomMappingEncoder[R, L]
   ): DerivedCustomMappingEncoder[A, L] = new DerivedCustomMappingEncoder[A, L] {
     override def encode(a: A, output: CodedOutputStream): Unit = {
       encoder.encode(gen.to(a), output)

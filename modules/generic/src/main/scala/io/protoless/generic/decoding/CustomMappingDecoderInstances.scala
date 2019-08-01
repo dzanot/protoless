@@ -5,7 +5,6 @@ import com.google.protobuf.CodedInputStream
 import shapeless.ops.nat.ToInt
 import shapeless.{::, Generic, HList, HNil, Nat}
 
-import io.protoless.messages.decoders.CustomMappingDecoder
 import io.protoless.fields.FieldDecoder
 import io.protoless.messages.Decoder.Result
 
@@ -19,7 +18,7 @@ trait CustomMappingDecoderInstances extends IncrementalDecoderInstances {
   implicit def decodeCustomMappingHList[H, T <: HList, L <: Nat, TN <: HList](implicit
     hDecoder: FieldDecoder[H],
     index: ToInt[L],
-    tDecoder: CustomMappingDecoder[T, TN]
+    tDecoder: DerivedCustomMappingDecoder[T, TN]
   ): DerivedCustomMappingDecoder[H :: T, L :: TN] = new DerivedCustomMappingDecoder[H :: T, L :: TN] {
     override def decode(input: CodedInputStream): Result[H :: T] = {
       for {
@@ -45,7 +44,7 @@ trait CustomMappingDecoderInstances extends IncrementalDecoderInstances {
 
   implicit def decodeCustomMapping[A, L <: HList, R <: HList](implicit
     gen: Generic.Aux[A, R],
-    decoder: CustomMappingDecoder[R, L]
+    decoder: DerivedCustomMappingDecoder[R, L]
   ): DerivedCustomMappingDecoder[A, L] = new DerivedCustomMappingDecoder[A, L] {
     override def decode(input: CodedInputStream): Result[A] = {
       decoder.decode(input) match {
