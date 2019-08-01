@@ -13,7 +13,7 @@ trait IncrementalEncoder[A, N <: Nat] extends Encoder[A]
 /**
   * Utilities for [[IncrementalEncoder]]
   */
-final object IncrementalEncoder {
+final object IncrementalEncoder extends {
 
   def apply[A, N <: Nat](implicit instance: IncrementalEncoder[A, N]): IncrementalEncoder[A, N] = instance
 

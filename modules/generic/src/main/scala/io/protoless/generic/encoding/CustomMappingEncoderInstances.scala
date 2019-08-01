@@ -10,7 +10,7 @@ import io.protoless.fields.FieldEncoder
 
 trait CustomMappingEncoderInstances extends IncrementalEncoderInstances {
 
-  implicit val encodeCustomMappingHNil: CustomMappingEncoder[HNil, HNil] = new CustomMappingEncoder[HNil, HNil] {
+  implicit val encodeCustomMappingHNil: DerivedCustomMappingEncoder[HNil, HNil] = new DerivedCustomMappingEncoder[HNil, HNil] {
     override def encode(a: HNil, output: CodedOutputStream): Unit = {}
   }
 
@@ -19,7 +19,7 @@ trait CustomMappingEncoderInstances extends IncrementalEncoderInstances {
     hEncoder: FieldEncoder[H],
     index: ToInt[L],
     tEncoder: CustomMappingEncoder[T, TN]
-  ): CustomMappingEncoder[H :: T, L :: TN] = new CustomMappingEncoder[H :: T, L :: TN] {
+  ): DerivedCustomMappingEncoder[H :: T, L :: TN] = new DerivedCustomMappingEncoder[H :: T, L :: TN] {
     override def encode(a: H :: T, output: CodedOutputStream): Unit = {
       val (h :: t) = a
       hEncoder.write(index(), h, output)
@@ -43,7 +43,7 @@ trait CustomMappingEncoderInstances extends IncrementalEncoderInstances {
   implicit def encodeCustomMapping[A, L <: HList, R <: HList](implicit
     gen: Generic.Aux[A, R],
     encoder: CustomMappingEncoder[R, L]
-  ): CustomMappingEncoder[A, L] = new CustomMappingEncoder[A, L] {
+  ): DerivedCustomMappingEncoder[A, L] = new DerivedCustomMappingEncoder[A, L] {
     override def encode(a: A, output: CodedOutputStream): Unit = {
       encoder.encode(gen.to(a), output)
       output.flush()

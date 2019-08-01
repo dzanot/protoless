@@ -19,3 +19,5 @@ private[protoless] trait SemiAutoDecoderInstances extends CustomMappingDecoderIn
   }
 
 }
+
+object SemiAutoDecoder extends SemiAutoDecoderInstances

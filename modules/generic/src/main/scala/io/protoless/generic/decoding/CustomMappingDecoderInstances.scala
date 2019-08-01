@@ -11,7 +11,7 @@ import io.protoless.messages.Decoder.Result
 
 trait CustomMappingDecoderInstances extends IncrementalDecoderInstances {
 
-  implicit val decodeCustomMappingHNil: CustomMappingDecoder[HNil, HNil] = new CustomMappingDecoder[HNil, HNil] {
+  implicit val decodeCustomMappingHNil: DerivedCustomMappingDecoder[HNil, HNil] = new DerivedCustomMappingDecoder[HNil, HNil] {
     override def decode(input: CodedInputStream): Result[HNil] = Right(HNil)
   }
 
@@ -20,7 +20,7 @@ trait CustomMappingDecoderInstances extends IncrementalDecoderInstances {
     hDecoder: FieldDecoder[H],
     index: ToInt[L],
     tDecoder: CustomMappingDecoder[T, TN]
-  ): CustomMappingDecoder[H :: T, L :: TN] = new CustomMappingDecoder[H :: T, L :: TN] {
+  ): DerivedCustomMappingDecoder[H :: T, L :: TN] = new DerivedCustomMappingDecoder[H :: T, L :: TN] {
     override def decode(input: CodedInputStream): Result[H :: T] = {
       for {
         h <- hDecoder.read(input, index()).right
@@ -46,7 +46,7 @@ trait CustomMappingDecoderInstances extends IncrementalDecoderInstances {
   implicit def decodeCustomMapping[A, L <: HList, R <: HList](implicit
     gen: Generic.Aux[A, R],
     decoder: CustomMappingDecoder[R, L]
-  ): CustomMappingDecoder[A, L] = new CustomMappingDecoder[A, L] {
+  ): DerivedCustomMappingDecoder[A, L] = new DerivedCustomMappingDecoder[A, L] {
     override def decode(input: CodedInputStream): Result[A] = {
       decoder.decode(input) match {
         case Right(repr) => Right(gen.from(repr))

@@ -18,3 +18,5 @@ private[protoless] trait SemiAutoEncoderInstances extends CustomMappingEncoderIn
     new SemiAutoEncoder[A](encoder)
   }
 }
+
+object SemiAutoEncoder extends SemiAutoEncoderInstances

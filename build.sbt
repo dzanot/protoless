@@ -102,7 +102,7 @@ lazy val settings = Seq(
 
   // Typelevel-4 scala options
   scalacOptions ++= Seq(
-    "-Yinduction-heuristics",       // speeds up the compilation of inductive implicit resolution
+//    "-Yinduction-heuristics",       // speeds up the compilation of inductive implicit resolution
     "-Yliteral-types",              // literals can appear in type position
     "-Xstrict-patmat-analysis",     // more accurate reporting of failures of match exhaustivity
     "-Xlint:strict-unsealed-patmat" // warn on inexhaustive matches against unsealed traits
