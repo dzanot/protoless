@@ -6,9 +6,9 @@ import com.google.protobuf.ByteString
 import io.protoless.tag._
 import shapeless.{Unwrapped, tag}
 
-import scala.annotation.{implicitNotFound, inductive}
+import scala.annotation.implicitNotFound
 
-@inductive
+
 @implicitNotFound("No FieldDefault found for type ${A}.")
 trait FieldDefault[A] {
  val default: A

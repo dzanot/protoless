@@ -5,7 +5,7 @@ import io.protoless.messages.{Decoder, Encoder}
 import io.protoless.tests.ProtolessSuite
 import io.protoless.tests.instances.EqualityInstances
 import io.protoless.tests.samples._
-import io.protoless.generic.semiauto.{deriveDecoder, deriveEncoder}
+import io.protoless.generic.semiauto._
 
 class SemiAutoEncoderDecoderSuite extends ProtolessSuite with EqualityInstances with EncoderDecoderAssertions {
 

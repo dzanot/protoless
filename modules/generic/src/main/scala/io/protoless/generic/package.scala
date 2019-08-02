@@ -1,8 +1,7 @@
 package io.protoless
 
 import shapeless.HList
-import io.protoless.generic.decoding.AutoDecoderInstances
-import io.protoless.generic.decoding.DerivedCustomMappingDecoder
+import io.protoless.generic.decoding.{AutoDecoderInstances, DerivedCustomMappingDecoder, DerivedFieldDefaults}
 import io.protoless.generic.decoding.internal.SemiAutoDecoder
 import io.protoless.generic.encoding.{AutoEncoderInstances, DerivedCustomMappingEncoder}
 import io.protoless.generic.encoding.internal.SemiAutoEncoder
@@ -18,14 +17,14 @@ package object generic {
     * You can still derive [[messages.decoders.CustomMappingDecoder]] and [[messages.encoders.CustomMappingEncoder]]
     * with `semiauto.deriveDecoder[A, L]` or by summoning a decoder with `CustomMappingDecoder[A, HList]` (idem for Encoders).
     */
-  object auto extends AutoDecoderInstances with AutoEncoderInstances
+  object auto extends AutoDecoderInstances with AutoEncoderInstances with DerivedFieldDefaults
 
   /**
     * Allows to manually derive [[Decoder]] and [[Encoder]],
     * either with `Automatic` strategy or `Custom Mapping` strategy.
     */
 
-  object semiauto {
+  object semiauto extends DerivedFieldDefaults {
 
     /**
       * Derive an [[Decoder]] to decode a type `A` from a protobuf message, for which
