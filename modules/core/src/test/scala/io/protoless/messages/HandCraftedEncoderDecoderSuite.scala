@@ -1,8 +1,8 @@
 package io.protoless.messages
 
 import com.google.protobuf.ByteString
-
 import io.protoless.EncoderDecoderAssertions
+import io.protoless.fields.FieldDefault
 import io.protoless.tag.{@@, Fixed, Signed, Unsigned}
 import io.protoless.tests.ProtolessSuite
 import io.protoless.tests.samples.{Colors, TestCaseAllFields, TestCaseCustomMappingRepeated, TestCaseNested}
@@ -12,6 +12,9 @@ import io.protoless.tests.samples.TestCaseNested.InnerNested
 class HandCraftedEncoderDecoderSuite extends ProtolessSuite with EncoderDecoderAssertions {
 
   import cats.syntax.either._ // Only required for scala 2.11.x (see http://typelevel.org/cats/faq.html#either)
+  implicit def innerNestedDefault: FieldDefault[InnerNested] = new FieldDefault[InnerNested] {
+    override val default: InnerNested = InnerNested(FieldDefault[BigDecimal].default, FieldDefault[BigInt].default)
+  }
 
   implicit val decoderTestCaseAllFields: Decoder[TestCaseAllFields] = Decoder.instance(input =>
     for {

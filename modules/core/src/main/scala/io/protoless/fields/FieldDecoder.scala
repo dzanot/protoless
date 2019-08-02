@@ -5,15 +5,13 @@ import scala.collection.mutable
 import scala.collection.generic.CanBuildFrom
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
-
 import com.google.protobuf.{ByteString, WireFormat, CodedInputStream => CIS}
 import com.google.protobuf.WireFormat.FieldType
 import shapeless.Unwrapped
-
 import cats.data.NonEmptyList
 import io.protoless.tag
 import io.protoless.messages.Decoder.Result
-import io.protoless.error.{DecodingFailure, WrongFieldType}
+import io.protoless.error.{DecodingFailure, MissingField, WrongFieldType}
 import io.protoless.messages.Decoder
 import io.protoless.tag._
 
@@ -34,7 +32,10 @@ trait FieldDecoder[A] extends Serializable { self =>
     if (input.isEmpty) {
       Right(FieldDefault[A].default)
     } else {
-      read(CIS.newInstance(input), index)
+      read(CIS.newInstance(input), index) match {
+        case Left(MissingField(_, _, _, _)) => Right(default.default)
+        case x => x
+      }
     }
   }
 
@@ -387,11 +388,12 @@ trait MidPriorityFieldDecoder extends LowPriorityFieldDecoder {
     *
     * @group Decoding
     */
-  implicit final def decodeNestedMessage[A](implicit dec: Decoder[A]): RepeatableFieldDecoder[A] = new RepeatableFieldDecoder[A] {
+  implicit final def decodeNestedMessage[A](implicit dec: Decoder[A], default: FieldDefault[A]): RepeatableFieldDecoder[A] = new RepeatableFieldDecoder[A] {
     override def read(input: CIS, index: Int): Result[A] = {
       val tag = readTag(input, index)
-      if (tag.wireType == WireFormat.FieldType.MESSAGE.getWireType)  {
-
+      if (tag == FieldTag(0, 0)) {
+        Right(default.default)
+      } else if (tag.wireType == WireFormat.FieldType.MESSAGE.getWireType)  {
         val messageBytes = input.readByteArray()
         dec.decode(messageBytes)
       } else {

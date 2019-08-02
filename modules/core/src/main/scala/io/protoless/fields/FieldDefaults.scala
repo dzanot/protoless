@@ -6,16 +6,19 @@ import com.google.protobuf.ByteString
 import io.protoless.tag._
 import shapeless.{Unwrapped, tag}
 
-import scala.annotation.implicitNotFound
+import scala.annotation.{implicitNotFound, inductive}
 
+@inductive
 @implicitNotFound("No FieldDefault found for type ${A}.")
 trait FieldDefault[A] {
  val default: A
 }
 
-final object FieldDefault {
+final object FieldDefault extends HighPriorityFieldDefaults {
  def apply[A](implicit instance: FieldDefault[A]) : FieldDefault[A] = instance
+}
 
+trait HighPriorityFieldDefaults extends LowPriorityFieldDefaults {
  private def defaultOf[A](v: A) : FieldDefault[A] = new FieldDefault[A] {
   override val default: A = v
  }
@@ -71,18 +74,19 @@ final object FieldDefault {
 
  implicit final val charDefault =
   defaultOf[Char](0)
+}
 
- implicit def valueClassDefault[A <: AnyVal, V](implicit
-                                                ev: A <:< AnyVal,
-                                                unwrapped: Unwrapped.Aux[A, V],
-                                                v: FieldDefault[V]
-                                                ): FieldDefault[A] = new FieldDefault[A] {
-  override val default: A = unwrapped.wrap(v.default)
-
- }
+trait LowPriorityFieldDefaults {
+  implicit def valueClassDefault[A <: AnyVal, V](implicit
+                                                 unwrapped: Unwrapped.Aux[A, V],
+                                                 ev: A <:< AnyVal,
+                                                 v: FieldDefault[V]
+                                                 ): FieldDefault[A] = new FieldDefault[A] {
+   override val default: A = unwrapped.wrap(v.default)
+  }
 
  implicit def listDefault[A]: FieldDefault[List[A]] = new FieldDefault[List[A]] {
-   override val default: List[A] = Nil
+  override val default: List[A] = Nil
  }
 
  implicit def optionDefault[A]: FieldDefault[Option[A]] = new FieldDefault[Option[A]] {
