@@ -13,7 +13,7 @@ import shapeless.Unwrapped
 import cats.data.NonEmptyList
 import io.protoless.tag
 import io.protoless.messages.Decoder.Result
-import io.protoless.error.{DecodingFailure, MissingField, WrongFieldType}
+import io.protoless.error.{DecodingFailure, WrongFieldType}
 import io.protoless.messages.Decoder
 import io.protoless.tag._
 
@@ -31,7 +31,7 @@ trait FieldDecoder[A] extends Serializable { self =>
     * Read value located at index `index` as an object of type `A` from an Array[Byte].
     */
   final def decode(input: Array[Byte], index: Int)(implicit default: FieldDefault[A]): Result[A] = {
-    if(input.isEmpty) {
+    if (input.isEmpty) {
       Right(FieldDefault[A].default)
     } else {
       read(CIS.newInstance(input), index)
@@ -206,13 +206,13 @@ object FieldDecoder extends MidPriorityFieldDecoder {
     *
     * @group Utilities
     */
-  final private[protoless] def native[A](r: CIS => A, expectedType: FieldType): RepeatableFieldDecoder[A] = new RepeatableFieldDecoder[A] {
+  final private[protoless] def native[A](r: CIS => A, expectedType: FieldType)(implicit default: FieldDefault[A]): RepeatableFieldDecoder[A] = new RepeatableFieldDecoder[A] {
     override def fieldType: FieldType = expectedType
     override def read(input: CIS, index: Int): Result[A] = {
       val tag = readTag(input, index)
 
       // Check that the fieldNumber match the current index
-      if (tag.fieldNumber != index) Left(MissingField(index, expectedType, tag.wireType, tag.fieldNumber))
+      if (tag.fieldNumber != index) Right(default.default)
       // Check if the type match, except if fieldType=2 for repeatedfields
       else if (tag.wireType != 2 && tag.wireType != expectedType.getWireType) Left(WrongFieldType(expectedType, tag.fieldNumber, tag.wireType))
       // else try to decode the input

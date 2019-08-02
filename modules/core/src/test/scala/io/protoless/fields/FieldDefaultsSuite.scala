@@ -9,7 +9,7 @@ import io.protoless.tests.ProtolessSuite
 
 class FieldDefaultsSuite extends ProtolessSuite {
   private val noBytes: Array[Byte] = Array[Byte]()
-  "Decode empty bytes as default vaule" - {
+  "Decode empty bytes as default value" - {
     "Int" in {
       check[Int]
     }

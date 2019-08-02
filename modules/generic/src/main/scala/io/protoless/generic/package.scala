@@ -1,10 +1,10 @@
 package io.protoless
 
-import shapeless.{HList, Nat}
+import shapeless.HList
 import io.protoless.generic.decoding.AutoDecoderInstances
 import io.protoless.generic.decoding.DerivedCustomMappingDecoder
 import io.protoless.generic.decoding.internal.SemiAutoDecoder
-import io.protoless.generic.encoding.{AutoEncoderInstances, DerivedCustomMappingEncoder, DerivedIncrementalEncoder}
+import io.protoless.generic.encoding.{AutoEncoderInstances, DerivedCustomMappingEncoder}
 import io.protoless.generic.encoding.internal.SemiAutoEncoder
 import io.protoless.messages.{Decoder, Encoder}
 
