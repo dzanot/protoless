@@ -4,7 +4,7 @@ import java.util.UUID
 
 import com.google.protobuf.ByteString
 import io.protoless.tag._
-import shapeless.{Unwrapped, tag}
+import shapeless.{Lazy, Unwrapped, tag}
 
 import scala.annotation.implicitNotFound
 import scala.collection.generic.CanBuildFrom
@@ -81,9 +81,9 @@ trait LowPriorityFieldDefaults {
   implicit def valueClassDefault[A <: AnyVal, V](implicit
                                                  unwrapped: Unwrapped.Aux[A, V],
                                                  ev: A <:< AnyVal,
-                                                 v: FieldDefault[V]
+                                                 v: Lazy[FieldDefault[V]]
                                                  ): FieldDefault[A] = new FieldDefault[A] {
-   override val default: A = unwrapped.wrap(v.default)
+   override val default: A = unwrapped.wrap(v.value.default)
   }
 
  implicit def traversableDefault[A, C[A] <: Traversable[A]](implicit cbf: CanBuildFrom[Nothing, A, C[A]]): FieldDefault[C[A]] = new FieldDefault[C[A]] {
