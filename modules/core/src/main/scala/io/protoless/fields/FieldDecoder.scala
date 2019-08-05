@@ -391,7 +391,7 @@ trait MidPriorityFieldDecoder extends LowPriorityFieldDecoder {
   implicit final def decodeNestedMessage[A](implicit dec: Decoder[A], default: FieldDefault[A]): RepeatableFieldDecoder[A] = new RepeatableFieldDecoder[A] {
     override def read(input: CIS, index: Int): Result[A] = {
       val tag = readTag(input, index)
-      if (tag == FieldTag(0, 0)) {
+      if (tag.fieldNumber > index || tag.fieldNumber == 0) {
         Right(default.default)
       } else if (tag.wireType == WireFormat.FieldType.MESSAGE.getWireType)  {
         val messageBytes = input.readByteArray()

@@ -6,10 +6,11 @@ import io.protoless.tests.ProtolessSuite
 
 class MessageDefaultsSuite extends ProtolessSuite {
   case class Foo(s: String)
+  case class Bar(f: Foo, i: Int)
   case class Qux(i: Int, s: String, b: Boolean, f: Float, l: List[Int], o: Option[Int], nl: List[Foo])
   val base = Qux(1, "1", true, 1.0f, List(1), Some(1), List(Foo("foo")))
   List(8, 1, 18, 1, 49, 24, 1, 37, 0, 0, -128, 63, 42, 1, 1, 48, 1, 58, 5, 10, 3, 102, 111, 111)
-
+  Array(10, 3, 10, 1, 49, 16, 1)
   "Decode missing fields as default values" - {
     "Int" in {
       check(Array(18, 1, 49, 24, 1, 37, 0, 0, -128, 63, 42, 1, 1, 48, 1, 58, 5, 10, 3, 102, 111, 111), base.copy(i = 0))
@@ -28,6 +29,9 @@ class MessageDefaultsSuite extends ProtolessSuite {
     }
     "Option" in {
       check(Array(8, 1, 18, 1, 49, 24, 1, 37, 0, 0, -128, 63, 42, 1, 1, 58, 5, 10, 3, 102, 111, 111), base.copy(o = None))
+    }
+    "Nested case class" in {
+      check(Array(16, 1), Bar(Foo(""), 1))
     }
     "Nested List" in {
       check(Array(8, 1, 18, 1, 49, 24, 1, 37, 0, 0, -128, 63, 42, 1, 1, 48, 1), base.copy(nl = Nil))
