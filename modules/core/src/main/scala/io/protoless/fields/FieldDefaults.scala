@@ -7,6 +7,7 @@ import io.protoless.tag._
 import shapeless.{Unwrapped, tag}
 
 import scala.annotation.implicitNotFound
+import scala.collection.generic.CanBuildFrom
 
 
 @implicitNotFound("No FieldDefault found for type ${A}.")
@@ -85,8 +86,8 @@ trait LowPriorityFieldDefaults {
    override val default: A = unwrapped.wrap(v.default)
   }
 
- implicit def listDefault[A]: FieldDefault[List[A]] = new FieldDefault[List[A]] {
-  override val default: List[A] = Nil
+ implicit def traversableDefault[A, C[A] <: Traversable[A]](implicit cbf: CanBuildFrom[Nothing, A, C[A]]): FieldDefault[C[A]] = new FieldDefault[C[A]] {
+  override val default: C[A] = cbf.apply().result()
  }
 
  implicit def optionDefault[A]: FieldDefault[Option[A]] = new FieldDefault[Option[A]] {

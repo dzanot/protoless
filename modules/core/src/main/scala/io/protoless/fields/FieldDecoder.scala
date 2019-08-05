@@ -416,7 +416,7 @@ trait LowPriorityFieldDecoder {
     *
     * @group Collection
     */
-  implicit final def decodeTraversable[A, C[A] <: Traversable[A]](implicit dec: RepeatableFieldDecoder[A], cbf: CanBuildFrom[Nothing, A, C[A]])
+  implicit final def decodeTraversable[A, C[A] <: Traversable[A]](implicit dec: RepeatableFieldDecoder[A], cbf: CanBuildFrom[Nothing, A, C[A]], default: FieldDefault[C[A]])
       : RepeatableFieldDecoder[C[A]] = new RepeatableFieldDecoder[C[A]] {
 
     @scala.annotation.tailrec
@@ -449,9 +449,8 @@ trait LowPriorityFieldDecoder {
     override def read(input: CIS, index: Int): Result[C[A]] = {
       val tag = readTag(input, index)
 
-      if (tag.fieldNumber > index) Right(cbf.apply().result())
-      else {
-        if (dec.fieldType.getWireType == WireFormat.WIRETYPE_LENGTH_DELIMITED) {
+      if (tag.fieldNumber > index || tag.fieldNumber == 0) Right(default.default)
+      else if (dec.fieldType.getWireType == WireFormat.WIRETYPE_LENGTH_DELIMITED) {
           readUntilFieldNumberEquals(index, input, cbf.apply())
         } else {
           val size = input.readRawVarint32()
@@ -460,8 +459,6 @@ trait LowPriorityFieldDecoder {
           input.popLimit(limit)
           result
         }
-
-      }
     }
 
     override def fieldType: FieldType = dec.fieldType
@@ -477,8 +474,9 @@ trait LowPriorityFieldDecoder {
   implicit final def decodeArray[A](implicit
       dec: RepeatableFieldDecoder[A],
       cbf: CanBuildFrom[Nothing, A, Seq[A]],
-      tp: ClassTag[A]): RepeatableFieldDecoder[Array[A]] = {
-    decodeTraversable[A, Seq](dec, cbf).map(_.toArray)
+      tp: ClassTag[A],
+      default: FieldDefault[Seq[A]]): RepeatableFieldDecoder[Array[A]] = {
+    decodeTraversable[A, Seq](dec, cbf, default).map(_.toArray)
   }
 
   /**
